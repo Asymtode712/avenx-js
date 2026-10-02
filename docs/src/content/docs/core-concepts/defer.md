@@ -1,17 +1,17 @@
 ---
 title: Deferred Loading (<@defer>)
-description: Deklaratives Verzögern von Komponenten und DOM-Subbäumen bis ein definierter Trigger ausgelöst wird.
+description: Declarative deferred loading of components and DOM subtrees until a defined trigger fires.
 ---
 
-Das `<@defer>`-Compiler-Tag ermöglicht das **deklarative Verzögern** von Komponenten und DOM-Subbäumen in Avenx.js. Der Inhalt wird nicht sofort gerendert, sondern erst dann geladen, wenn der konfigurierte Trigger ausgelöst wird.
+The `<@defer>` compiler tag enables **declarative deferred loading** of components and DOM subtrees in Avenx.js. Content is not rendered immediately; instead, it is loaded only when the configured trigger is fired.
 
-Dies kann dazu beitragen, die anfängliche Rendering- und JavaScript-Arbeitslast zu reduzieren, indem nicht benötigte Inhalte erst bei Bedarf verarbeitet werden.
+This can help reduce the initial rendering and JavaScript workload by processing non-critical content only when needed.
 
 ---
 
-## Basis-Syntax
+## Basic Syntax
 
-Um einen Template-Bereich zu verzögern, umhülle ihn einfach mit dem `<@defer>`-Tag:
+To defer a section of your template, simply wrap it with the `<@defer>` tag:
 
 ```html
 <@defer>
@@ -19,27 +19,27 @@ Um einen Template-Bereich zu verzögern, umhülle ihn einfach mit dem `<@defer>`
 </@defer>
 ```
 
-Wenn kein `when`-Attribut angegeben wird, verwendet `<@defer>` standardmäßig den `idle`-Trigger. Dabei wird `requestIdleCallback` verwendet, sofern diese Browser-API verfügbar ist. Andernfalls wird auf einen kurzen Timer zurückgegriffen.
+When no `when` attribute is specified, `<@defer>` defaults to the `idle` trigger. It uses `requestIdleCallback` when available in the browser, falling back to a short timer otherwise.
 
 ---
 
-## Trigger-Modi (`when="..."`)
+## Trigger Modes (`when="..."`)
 
-Über das `when`-Attribut lässt sich festlegen, wann der verzögerte Inhalt geladen werden soll:
+The `when` attribute defines when the deferred content should be loaded:
 
-| Trigger               | Syntax                              | Beschreibung                                                                                          |
-| --------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **`idle`** (Standard) | `<@defer when="idle">`              | Lädt den Inhalt während der Browser-Leerlaufzeit.                                                     |
-| **`visible`**         | `<@defer when="visible">`           | Lädt den Inhalt, sobald der Defer-Container im Viewport sichtbar wird.                                |
-| **`interaction`**     | `<@defer when="interaction">`       | Lädt den Inhalt bei einer Benutzerinteraktion. Aktuell lösen `click` oder `mouseenter` das Laden aus. |
-| **`timer(ms)`**       | `<@defer when="timer(1000)">`       | Lädt den Inhalt nach der angegebenen Verzögerung in Millisekunden.                                    |
-| **Ausdruck**          | `<@defer when="state.showDetails">` | Wertet den angegebenen Ausdruck aus und lädt den Inhalt, wenn das Ergebnis wahr ist.                  |
+| Trigger              | Syntax                              | Description                                                                               |
+| -------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| **`idle`** (Default) | `<@defer when="idle">`              | Loads content during browser idle time.                                                   |
+| **`visible`**        | `<@defer when="visible">`           | Loads content as soon as the defer container becomes visible in the viewport.             |
+| **`interaction`**    | `<@defer when="interaction">`       | Loads content upon user interaction. Currently, `click` or `mouseenter` triggers loading. |
+| **`timer(ms)`**      | `<@defer when="timer(1000)">`       | Loads content after the specified delay in milliseconds.                                  |
+| **Expression**       | `<@defer when="state.showDetails">` | Evaluates the specified expression and loads content when the result is truthy.           |
 
 ---
 
 ### `idle`
 
-Der `idle`-Trigger lädt den verzögerten Inhalt, sobald der Browser Leerlaufzeit zur Verfügung hat.
+The `idle` trigger loads deferred content as soon as the browser has idle time available.
 
 ```html
 <@defer when="idle">
@@ -47,11 +47,11 @@ Der `idle`-Trigger lädt den verzögerten Inhalt, sobald der Browser Leerlaufzei
 </@defer>
 ```
 
-Avenx.js verwendet dafür `requestIdleCallback`, sofern diese Browser-API verfügbar ist. Andernfalls wird ein kurzer Timer als Fallback verwendet.
+Avenx.js uses `requestIdleCallback` when this browser API is available, falling back to a short timer otherwise.
 
 ### `visible`
 
-Der `visible`-Trigger lädt den Inhalt, sobald der Defer-Container im Viewport sichtbar wird.
+The `visible` trigger loads content as soon as the defer container becomes visible in the viewport.
 
 ```html
 <@defer when="visible">
@@ -59,13 +59,14 @@ Der `visible`-Trigger lädt den Inhalt, sobald der Defer-Container im Viewport s
 </@defer>
 ```
 
-Avenx.js verwendet dafür `IntersectionObserver`. Sobald der Container sichtbar wird, wird der Observer beendet und der verzögerte Inhalt geladen.
+Avenx.js uses an `IntersectionObserver` for this. Once the container becomes visible, the observer is disconnected and the deferred content is loaded.
 
 ### `interaction`
 
-Der `interaction`-Trigger lädt den Inhalt, sobald der Benutzer mit dem Defer-Container interagiert.
+The `interaction` trigger loads content as soon as the user interacts with the defer container.
 
-Aktuell lösen sowohl `click` als auch `mouseenter` das Laden des Inhalts aus. Die Trigger-Werte `click` und `hover` werden ebenfalls als Interaktions-Trigger unterstützt.
+Currently, both `click` and `mouseenter` trigger loading of the content. The trigger values `click` and `hover` are also supported as interaction triggers.
+
 ```html
 <@defer when="click">
   <HeavyChart />
@@ -78,7 +79,7 @@ Aktuell lösen sowohl `click` als auch `mouseenter` das Laden des Inhalts aus. D
 
 ### `timer`
 
-Der `timer`-Trigger lädt den verzögerten Inhalt nach Ablauf einer angegebenen Verzögerung in Millisekunden.
+The `timer` trigger loads deferred content after the specified delay in milliseconds elapses.
 
 ```html
 <@defer when="timer(2000)">
@@ -86,11 +87,11 @@ Der `timer`-Trigger lädt den verzögerten Inhalt nach Ablauf einer angegebenen 
 </@defer>
 ```
 
-In diesem Beispiel wird der Inhalt nach 2000 Millisekunden (2 Sekunden) geladen. Avenx.js unterstützt auch Zeitangaben im Format `1000ms`.
+In this example, the content is loaded after 2000 milliseconds (2 seconds). Avenx.js also supports time values in the `1000ms` format.
 
-### `Ausdruck`
+### Expression
 
-Ein Ausdruck kann als Trigger verwendet werden, um den verzögerten Inhalt abhängig vom aktuellen Zustand zu laden.
+An expression can be used as a trigger in the `when="<expression>"` form to load deferred content based on the current state.
 
 ```html
 <@defer when="state.isReady">
@@ -98,17 +99,15 @@ Ein Ausdruck kann als Trigger verwendet werden, um den verzögerten Inhalt abhä
 </@defer>
 ```
 
-Der Ausdruck wird ausgewertet, wenn der Defer-Container verarbeitet wird. Wenn das Ergebnis wahr ist, wird der verzögerte Inhalt geladen. Wird der Container später erneut verarbeitet, wird der Ausdruck erneut ausgewertet.
+The expression is evaluated when the defer container is processed. If the result is truthy, the deferred content is loaded. If the container is processed again later, the expression is re-evaluated.
 
+## Placeholders & Loading States (`<@placeholder>` & `<@loading>`)
 
-
-## Platzhalter & Ladezustände (`<@placeholder>` & `<@loading>`)
-
-Innerhalb von `<@defer>` können optionale Sub-Tags verwendet werden.
+Optional sub-tags can be used within `<@defer>`.
 
 ### `<@placeholder>`
 
-`<@placeholder>` definiert den Inhalt, der angezeigt wird, während auf den konfigurierten Trigger gewartet wird.
+`<@placeholder>` defines the content displayed while waiting for the configured trigger.
 
 ```html
 <@defer when="visible">
@@ -124,7 +123,7 @@ Innerhalb von `<@defer>` können optionale Sub-Tags verwendet werden.
 
 ### `<@loading>`
 
-`<@loading>` wird vom Compiler erkannt und als separates Lade-Template vorbereitet.
+`<@loading>` is recognized by the compiler and prepared as a separate loading template.
 
 ```html
 <@defer when="visible">
@@ -136,15 +135,15 @@ Innerhalb von `<@defer>` können optionale Sub-Tags verwendet werden.
 </@defer>
 ```
 
-**Aktueller Status:** In der aktuellen synchronen Laufzeit wird das `<@loading>`-Template noch nicht angezeigt. Sobald der Trigger ausgelöst wird, wird der verzögerte Inhalt direkt gerendert. Eine aktive Anzeige des Ladezustands kann mit zukünftiger asynchroner Ladeunterstützung ergänzt werden.
+**Current status:** In the current synchronous runtime, the `<@loading>` template is not yet displayed. Once the trigger is fired, the deferred content is rendered directly. Active display of the loading state can be added with future asynchronous loading support.
 
 ---
 
-## Mehrere Trigger
+## Multiple Triggers
 
-Das Kombinieren mehrerer Trigger wird derzeit noch nicht unterstützt.
+Combining multiple triggers is not currently supported.
 
-Beispielsweise kann folgende Syntax aktuell nicht verwendet werden:
+For example, the following syntax cannot be used at this time:
 
 ```html
 <@defer when="visible; interaction">
@@ -152,32 +151,32 @@ Beispielsweise kann folgende Syntax aktuell nicht verwendet werden:
 </@defer>
 ```
 
-Aktuell kann für einen `<@defer>`-Block nur ein Trigger angegeben werden. Die Unterstützung für mehrere kombinierte Trigger ist für eine zukünftige Erweiterung vorgesehen.
+Currently, only one trigger can be specified for a `<@defer>` block. Support for combining multiple triggers is planned for a future update.
 
-## Cleanup und Lebenszyklus
+## Cleanup and Lifecycle
 
-Avenx.js registriert für aktive Trigger entsprechende Cleanup-Funktionen.
+Avenx.js registers corresponding cleanup functions for active triggers.
 
-Je nach verwendetem Trigger werden beispielsweise:
+Depending on the trigger used, these include:
 
-- Event-Listener für `click` und `mouseenter` entfernt.
-- Timer mit `clearTimeout()` abgebrochen.
-- Idle-Callbacks mit `cancelIdleCallback()` abgebrochen, sofern verfügbar.
-- `IntersectionObserver`-Instanzen mit `disconnect()` beendet.
+- Removing event listeners for `click` and `mouseenter`.
+- Canceling timers with `clearTimeout()`.
+- Canceling idle callbacks with `cancelIdleCallback()`, when available.
+- Disconnecting `IntersectionObserver` instances with `disconnect()`.
 
-Wenn der Trigger ausgelöst wird und der verzögerte Inhalt geladen wird, wird die zugehörige Trigger-Cleanup-Funktion ausgeführt.
+When the trigger is fired and the deferred content is loaded, the associated trigger cleanup function is executed.
 
-> **Hinweis:** Die vollständige Bereinigung beim Unmount eines übergeordneten Components ist derzeit noch nicht garantiert. Die `DeferManager.destroy()`-Methode ist momentan noch ein Platzhalter und wird beim Component-Teardown noch nicht aufgerufen. Eine vollständige Unmount-Bereinigung ist für eine zukünftige Erweiterung vorgesehen.
-
+> [!NOTE]
+> Complete cleanup on unmount of a parent component is not currently guaranteed. The `DeferManager.destroy()` method is currently a placeholder and is not yet called during component teardown. Full unmount cleanup is planned for a future update.
 
 ---
 
-## Technische Funktionsweise
+## How it works
 
-Die Verarbeitung von `<@defer>` erfolgt in zwei wesentlichen Schritten:
+Processing of `<@defer>` takes place in two primary steps:
 
-1. **Kompilier-Schritt:** Der `ComponentParser` erkennt `<@defer>` und wandelt es in einen speziellen Defer-Container um. Abhängig vom verwendeten Inhalt können darin Templates für `<@placeholder>`, `<@loading>` und den eigentlichen verzögerten Inhalt gespeichert werden.
+1. **Compilation step:** The compiler recognizes `<@defer>` and lowers it into a **render program** (or converts it into a special defer container when falling back to the **string renderer** via `ComponentParser`). Depending on the content used, templates for `<@placeholder>`, `<@loading>`, and the deferred content itself can be stored within it.
 
-2. **Laufzeit-Schritt:** Der `DeferManager` verarbeitet die Defer-Container und richtet den konfigurierten Trigger ein. Je nach Trigger verwendet er beispielsweise `requestIdleCallback`, `IntersectionObserver`, Event-Listener oder `setTimeout`.
+2. **Runtime step:** The `DeferManager` processes the defer containers and sets up the configured trigger. Depending on the trigger, it uses `requestIdleCallback`, `IntersectionObserver`, event listeners, or `setTimeout`.
 
-Sobald der Trigger ausgelöst wird, rendert der `DeferManager` den verzögerten Inhalt und entfernt zuvor gerenderten Placeholder-Inhalt.
+Once the trigger is fired, the `DeferManager` renders the deferred content and removes previously rendered placeholder content.
