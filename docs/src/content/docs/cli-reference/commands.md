@@ -989,3 +989,32 @@ npx avenx why CartSummary.total --json
 ```
 
 It takes the same `--json` and `--depth` options, resolves symbols the same way, and uses the same exit codes as `avenx impact`.
+
+---
+
+### 19. `avenx format`
+
+Formats project components, pages, stylesheets, JavaScript, Markdown and JSON files in place with Prettier. The command loads Avenx's Prettier plugin so Prettier can parse Avenx template syntax in component and page files.
+
+#### Files Formatted
+
+The command passes these globs to Prettier:
+
+- `src/**/*.component.js`
+- `src/**/*.page.js`
+- `src/**/*.css`
+- `**/*.js`
+- `**/*.md`
+- `**/*.json`
+
+Prettier uses the project's `.prettierrc` when present. New projects created with `avenx init` include one.
+
+#### Usage Example
+
+Run this from the project root to format the project files:
+
+```bash
+npx avenx format
+```
+
+The command exits with a non-zero status if Prettier fails. Because it uses `--write`, review the resulting changes before committing them.
