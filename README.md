@@ -681,6 +681,7 @@ compresses best, so the gap on the wire is much narrower than on disk.
 | `avenx build` | Production build into `dist/` (alias `b`). |
 | `avenx clean` | Clear the build output directory. |
 | `avenx check` | Validate templates without building (alias `lint`). Exits `1` on any warning. |
+| `avenx format` | Format component, page, CSS, JavaScript, Markdown and JSON files in place with Prettier. |
 
 ### Understand and diagnose
 
