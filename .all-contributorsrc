@@ -1099,6 +1099,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ArnavMohan65",
+      "name": "Arnav Mohan ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/114442113?v=4",
+      "profile": "https://github.com/ArnavMohan65",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitType": "docs",
