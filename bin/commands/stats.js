@@ -4,6 +4,7 @@ import ComponentParser from '../../lib/compiler/ComponentParser.js';
 import StyleProcessor from '../../lib/compiler/StyleProcessor.js';
 import { AtlasNodeKind } from '../../lib/compiler/atlas/AppModel.js';
 import { buildModel } from './atlas.js';
+import { withWarningsSuppressed } from '../../lib/compiler/utils/warningReporter.js';
 import { bold, cyan, green, yellow, gray } from '../colors.js';
 
 /**
@@ -185,66 +186,73 @@ export function analyzeStats(cli) {
     let compiledTemplateBytes = 0;
     let scopedCssBytes = 0;
 
+    // When the model was built, the compiler has already reported every
+    // diagnostic in this file once. The parsing below only measures sizes, so
+    // it must not report them a second time.
+    const measure = semantics.available ? withWarningsSuppressed : (fn) => fn();
+
     try {
-      const state = parser.expressionParser.parseState(content);
-      if (!semantics.available) {
-        statePropsCount = Object.keys(state || {}).length;
-      }
-
-      if (isComponent || isPage) {
-        // 2. Raw template extraction & byte size
-        const rawTpl = extractRawTemplate(content);
-        rawTemplateBytes = Buffer.byteLength(rawTpl, 'utf8');
-
-        // 3. The companion stylesheet, read before the template rather than
-        // after it.
-        //
-        // `extractTemplate` validates every `@css <block>` directive against
-        // the style blocks it is handed, so passing `{}` reported every block
-        // a component declares as undeclared: `avenx stats` printed AVX_W49
-        // for each one on a freshly generated project, for files `avenx build`
-        // and `avenx check` both accept. The blocks were being read further
-        // down, for the byte count, which was too late to be of any use to the
-        // validation above it.
-        let rawCss = '';
-        const styleMatch = content.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/i);
-        if (styleMatch) {
-          rawCss = styleMatch[1];
-        }
-        const cssFile = file.replace(/\.(component|page)\.js$/, '.$1.css');
-        if (fs.existsSync(cssFile)) {
-          rawCss += '\n' + fs.readFileSync(cssFile, 'utf-8');
+      measure(() => {
+        const state = parser.expressionParser.parseState(content);
+        if (!semantics.available) {
+          statePropsCount = Object.keys(state || {}).length;
         }
 
-        // Collected the way compileUnit collects it, so the validation sees
-        // the same blocks the build does.
-        const desBlocks = {};
-        if (rawCss.trim()) {
-          parser.extractStylesAndVars(rawCss, desBlocks, cssFile);
-        }
+        if (isComponent || isPage) {
+          // 2. Raw template extraction & byte size
+          const rawTpl = extractRawTemplate(content);
+          rawTemplateBytes = Buffer.byteLength(rawTpl, 'utf8');
 
-        // 4. Compiled template extraction & byte size.
-        //
-        // The declarations have to be read before the template is transformed,
-        // even though only its size is wanted here. `extractTemplate` validates
-        // every identifier a binding names against the state, computed values
-        // and actions it is given, so calling it with empty maps reported an
-        // action the component plainly declares as undeclared -- `avenx stats`
-        // printed AVX_W03 for a file `avenx build` and `avenx check` both
-        // accepted. Passing what the file actually declares costs one extra
-        // parse of a string already in memory.
-        const computed = parser.extractComputed(content);
-        const methods = parser.extractMethods(content, name, file);
-        const resources = parser.expressionParser.parseResources(content);
-        const compiledTpl = parser.extractTemplate(content, desBlocks, name, file, state, computed, methods, resources);
-        compiledTemplateBytes = Buffer.byteLength(compiledTpl || '', 'utf8');
+          // 3. The companion stylesheet, read before the template rather than
+          // after it.
+          //
+          // `extractTemplate` validates every `@css <block>` directive against
+          // the style blocks it is handed, so passing `{}` reported every block
+          // a component declares as undeclared: `avenx stats` printed AVX_W49
+          // for each one on a freshly generated project, for files `avenx build`
+          // and `avenx check` both accept. The blocks were being read further
+          // down, for the byte count, which was too late to be of any use to the
+          // validation above it.
+          let rawCss = '';
+          const styleMatch = content.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/i);
+          if (styleMatch) {
+            rawCss = styleMatch[1];
+          }
+          const cssFile = file.replace(/\.(component|page)\.js$/, '.$1.css');
+          if (fs.existsSync(cssFile)) {
+            rawCss += '\n' + fs.readFileSync(cssFile, 'utf-8');
+          }
 
-        // 5. Scoped CSS byte size
-        if (rawCss.trim()) {
-          const scopedCss = parser.styleProcessor.process(rawCss, {}, name, '');
-          scopedCssBytes = Buffer.byteLength(scopedCss || '', 'utf8');
+          // Collected the way compileUnit collects it, so the validation sees
+          // the same blocks the build does.
+          const desBlocks = {};
+          if (rawCss.trim()) {
+            parser.extractStylesAndVars(rawCss, desBlocks, cssFile);
+          }
+
+          // 4. Compiled template extraction & byte size.
+          //
+          // The declarations have to be read before the template is transformed,
+          // even though only its size is wanted here. `extractTemplate` validates
+          // every identifier a binding names against the state, computed values
+          // and actions it is given, so calling it with empty maps reported an
+          // action the component plainly declares as undeclared -- `avenx stats`
+          // printed AVX_W03 for a file `avenx build` and `avenx check` both
+          // accepted. Passing what the file actually declares costs one extra
+          // parse of a string already in memory.
+          const computed = parser.extractComputed(content);
+          const methods = parser.extractMethods(content, name, file);
+          const resources = parser.expressionParser.parseResources(content);
+          const compiledTpl = parser.extractTemplate(content, desBlocks, name, file, state, computed, methods, resources);
+          compiledTemplateBytes = Buffer.byteLength(compiledTpl || '', 'utf8');
+
+          // 5. Scoped CSS byte size
+          if (rawCss.trim()) {
+            const scopedCss = parser.styleProcessor.process(rawCss, {}, name, '');
+            scopedCssBytes = Buffer.byteLength(scopedCss || '', 'utf8');
+          }
         }
-      }
+      });
     } catch {
       // Fallback on parse failure
     }
