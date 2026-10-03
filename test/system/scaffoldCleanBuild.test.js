@@ -46,6 +46,38 @@ try {
   console.log('🧪 Testing that a scaffolded project builds clean...');
 
   assert.strictEqual(avenx(['init']).status, 0, 'init should succeed');
+
+  // VS Code custom data ships in every scaffold. Its Avenx attributes must
+  // match names the compiler actually handles, not merely valid HTML attrs.
+  {
+    const repoRoot = path.resolve(__dirname, '../..');
+    const editorData = JSON.parse(
+      fs.readFileSync(path.join(root, '.vscode/avenx.html-data.json'), 'utf8'),
+    );
+    const compilerAttributeNames = new Set();
+    for (const sourcePath of ['lib/compiler/codegen/collect.js', 'lib/compiler/ir/build.js']) {
+      const source = fs.readFileSync(path.join(repoRoot, sourcePath), 'utf8');
+      for (const [, name] of source.matchAll(/['"]((?:data-ax|data-avenx)-[a-z0-9-]+)['"]/g)) {
+        compilerAttributeNames.add(name);
+      }
+    }
+
+    const customAttributes = editorData.globalAttributes
+      .map(({ name }) => name)
+      .filter((name) => name.startsWith('data-ax-'));
+    for (const name of customAttributes) {
+      assert.ok(
+        compilerAttributeNames.has(name),
+        `scaffolded VS Code data advertises unsupported Avenx attribute ${name}`,
+      );
+    }
+
+    assert.ok(customAttributes.includes('data-ax-bind'), 'two-way binding completion should use data-ax-bind');
+    assert.ok(!customAttributes.includes('data-ax-model'), 'the unsupported data-ax-model alias must not be suggested');
+    const customTags = new Set(editorData.tags.map(({ name }) => name));
+    assert.ok(customTags.has('@loading'), 'the defer loading alias should have completion data');
+    assert.ok(customTags.has('@elif'), 'the conditional alias should have completion data');
+  }
   assert.strictEqual(avenx(['generate', 'page', 'Home']).status, 0, 'generate page should succeed');
   assert.strictEqual(avenx(['generate', 'component', 'Widget']).status, 0, 'generate component should succeed');
 
