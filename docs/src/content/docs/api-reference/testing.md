@@ -300,6 +300,24 @@ function mountTestComponent<C extends AvenxComponent>(
 | `html` | `string` | Getter returning the current serialized inner HTML markup of the container. |
 | `update()` | `() => void` | Manually triggers a synchronous component update cycle. |
 | `unmount()` | `() => void` | Invokes component unmounting, cleanup watchers, and lifecycle hooks (`onBeforeUnmount`, `onUnmounted`). |
+| `find(selector)` | `(selector: string) => Element \| null` | Returns the first matching element. The component root itself is checked before descendants. |
+| `findAll(selector)` | `(selector: string) => Element[]` | Returns all matching elements, with duplicate matches removed. |
+| `findComponent(ComponentClassOrName)` | `(ComponentClassOrName: Function \| string) => AvenxComponent \| null` | Returns the first mounted component instance matching a class or component name. |
+| `trigger(selectorOrEl, eventName, detail?)` | `(selectorOrEl: string \| Element, eventName: string, detail?: object) => Promise<void>` | Finds or accepts an element and dispatches an event through `fireEvent()`. |
+| `toMatchSnapshot(name?, options?)` | `(name?: string, options?: SnapshotOptions) => void` | Asserts the mounted output against a stored snapshot. |
+
+`find` accepts only a selector. It checks the component's root element before searching its descendants; `findAll` returns every unique match.
+
+```javascript
+import assert from 'node:assert/strict';
+import { mountTestComponent } from 'avenx-core/testing';
+import Toolbar from '../src/components/Toolbar.component.js';
+
+const wrapper = await mountTestComponent(Toolbar);
+
+assert.ok(wrapper.find('.primary-action'));
+assert.equal(wrapper.findAll('button').length, 3);
+```
 
 ---
 
