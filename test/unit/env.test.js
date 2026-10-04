@@ -91,11 +91,19 @@ try {
     const url = process.env.AVX_PUBLIC_API_URL;
     const port = process.env.AVX_PUBLIC_PORT;
     const fallback = process.env.AVX_PUBLIC_UNDEFINED_VAR;
+    const bracket1 = process.env['AVX_PUBLIC_API_URL'];
+    const bracket2 = process.env["AVX_PUBLIC_API_URL"];
+    const bracket3 = process.env[ 'AVX_PUBLIC_API_URL' ];
+    const computed = process.env[AVX_PUBLIC_API_URL];
   `;
   const replacedJs = replaceEnvVariables(sourceJs);
   assert.ok(replacedJs.includes('const url = "https://api.example.com";'));
   assert.ok(replacedJs.includes('const port = "8080";'));
   assert.ok(replacedJs.includes('const fallback = undefined;'));
+  assert.ok(replacedJs.includes('const bracket1 = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const bracket2 = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const bracket3 = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const computed = process.env[AVX_PUBLIC_API_URL];'));
 
   const templateStr = `<div>{{ process.env.AVX_PUBLIC_API_URL }}</div>`;
   const replacedTemplate = replaceEnvVariables(templateStr);
