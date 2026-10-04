@@ -1135,6 +1135,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "shwetang01",
+      "name": "Shwetang Yadav",
+      "avatar_url": "https://avatars.githubusercontent.com/u/183992718?v=4",
+      "profile": "https://github.com/shwetang01",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs",
