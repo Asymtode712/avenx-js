@@ -1,4 +1,5 @@
 import { getDiagnostic, suggestCodes } from '../../lib/core/diagnostics/catalogue.js';
+import { bold, cyan, red, yellow } from '../colors.js';
 
 /**
  * Executes the `avenx explain <CODE>` command.
@@ -38,12 +39,6 @@ export function explainDiagnostic(cli, rawCode, asJson = false) {
     console.log(JSON.stringify(diagnostic, null, 2));
     return;
   }
-
-  const useColor = !process.env.NO_COLOR && process.stdout.isTTY;
-  const bold = (s) => (useColor ? `\x1b[1m${s}\x1b[0m` : s);
-  const cyan = (s) => (useColor ? `\x1b[36m${s}\x1b[0m` : s);
-  const yellow = (s) => (useColor ? `\x1b[33m${s}\x1b[0m` : s);
-  const red = (s) => (useColor ? `\x1b[31m${s}\x1b[0m` : s);
 
   const severityColor = diagnostic.severity === 'error' ? red : yellow;
 
