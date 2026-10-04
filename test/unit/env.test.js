@@ -89,21 +89,25 @@ try {
 
   const sourceJs = `
     const url = process.env.AVX_PUBLIC_API_URL;
+    const singleQuoted = process.env['AVX_PUBLIC_API_URL'];
+    const doubleQuoted = process.env["AVX_PUBLIC_API_URL"];
+    const bracketSpaces = process.env[  'AVX_PUBLIC_API_URL'  ];
     const port = process.env.AVX_PUBLIC_PORT;
     const fallback = process.env.AVX_PUBLIC_UNDEFINED_VAR;
-    const bracket1 = process.env['AVX_PUBLIC_API_URL'];
-    const bracket2 = process.env["AVX_PUBLIC_API_URL"];
-    const bracket3 = process.env[ 'AVX_PUBLIC_API_URL' ];
-    const computed = process.env[AVX_PUBLIC_API_URL];
+    const computed = process.env[envKey];
+    const computedUnquoted = process.env[AVX_PUBLIC_API_URL];
+    const privateValue = process.env['API_SECRET'];
   `;
   const replacedJs = replaceEnvVariables(sourceJs);
   assert.ok(replacedJs.includes('const url = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const singleQuoted = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const doubleQuoted = "https://api.example.com";'));
+  assert.ok(replacedJs.includes('const bracketSpaces = "https://api.example.com";'));
   assert.ok(replacedJs.includes('const port = "8080";'));
   assert.ok(replacedJs.includes('const fallback = undefined;'));
-  assert.ok(replacedJs.includes('const bracket1 = "https://api.example.com";'));
-  assert.ok(replacedJs.includes('const bracket2 = "https://api.example.com";'));
-  assert.ok(replacedJs.includes('const bracket3 = "https://api.example.com";'));
-  assert.ok(replacedJs.includes('const computed = process.env[AVX_PUBLIC_API_URL];'));
+  assert.ok(replacedJs.includes('const computed = process.env[envKey];'));
+  assert.ok(replacedJs.includes('const computedUnquoted = process.env[AVX_PUBLIC_API_URL];'));
+  assert.ok(replacedJs.includes("const privateValue = process.env['API_SECRET'];"));
 
   const templateStr = `<div>{{ process.env.AVX_PUBLIC_API_URL }}</div>`;
   const replacedTemplate = replaceEnvVariables(templateStr);

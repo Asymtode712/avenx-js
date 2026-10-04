@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avenx Charts Example</title>
+    <link rel="stylesheet" href="dist/bundle.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <!--
+      The Avenx CLI compiles the application into one self-contained bundle that
+      already contains the runtime, so a plugin reaches that runtime through a
+      global rather than an import.
+
+      The plugin bundle loads first so `AvenxCharts` exists when main.app.js
+      calls `app.use(AvenxCharts.avenxCharts)`. The chart classes resolve the
+      runtime lazily — on the first chart they build, which is after the
+      application bundle has published it — so this order is safe even though
+      the runtime is not on the page yet when this script is parsed.
+
+      With a bundler (Vite, Rollup, webpack) drop this script and import
+      @avenx/charts normally instead. See @avenx/vite for the
+      `<chart.line .../>` shorthand that the preprocessor expands at build time.
+    -->
+    <script src="../dist/avenx-charts.global.js"></script>
+    <script src="dist/bundle.js"></script>
+</body>
+</html>

@@ -3,14 +3,7 @@
  * @module plugins/avenx-charts/src/components/BaseChart
  */
 
-let AvenxComponent;
-try {
-  const core = await import('avenx-core/runtime');
-  AvenxComponent = core.AvenxComponent;
-} catch {
-  const core = await import('../../../../lib/core/index.js');
-  AvenxComponent = core.AvenxComponent;
-}
+import { AvenxComponent } from '../runtime.js';
 import { createLinearScale, createPointScale, getExtent } from '../core/scales.js';
 import { generateGridLines } from '../core/shapes.js';
 import { resolveTheme, formatValue } from '../core/theme.js';
@@ -49,7 +42,7 @@ export class BaseChart extends AvenxComponent {
       </div>
       `,
       {},
-      props
+      props,
     );
 
     /** @type {ResizeObserver|null} */
@@ -258,9 +251,10 @@ export class BaseChart extends AvenxComponent {
     const height = Number(this.props.height) || Number(this.props['height']) || 320;
 
     const defaultMargin = { top: 24, right: 24, bottom: 38, left: 52 };
-    const margin = typeof this.props.margin === 'object' && this.props.margin !== null
-      ? { ...defaultMargin, ...this.props.margin }
-      : defaultMargin;
+    const margin =
+      typeof this.props.margin === 'object' && this.props.margin !== null
+        ? { ...defaultMargin, ...this.props.margin }
+        : defaultMargin;
 
     const plotWidth = Math.max(10, width - margin.left - margin.right);
     const plotHeight = Math.max(10, height - margin.top - margin.bottom);
@@ -367,10 +361,16 @@ export class BaseChart extends AvenxComponent {
     // 2. Gridlines
     if (this.isPropTrue('grid')) {
       const yTicks = yScale.ticks(5).map((t) => yScale(t));
-      const gridD = generateGridLines([], yTicks, [layout.plotLeft, layout.plotRight], [layout.plotTop, layout.plotBottom], {
-        horizontal: true,
-        vertical: false,
-      });
+      const gridD = generateGridLines(
+        [],
+        yTicks,
+        [layout.plotLeft, layout.plotRight],
+        [layout.plotTop, layout.plotBottom],
+        {
+          horizontal: true,
+          vertical: false,
+        },
+      );
       svgMarkup += `
         <g class="ax-chart-grid" opacity="1">
           <path d="${gridD}" stroke="${this.activeTheme.gridColor}" stroke-width="1" stroke-dasharray="3,3" fill="none" shape-rendering="crispEdges" />
@@ -539,7 +539,7 @@ export class BaseChart extends AvenxComponent {
         title: activeItem.xVal,
         items: visibleItems,
       },
-      this.activeTheme
+      this.activeTheme,
     );
 
     tooltipEl.style.background = this.activeTheme.tooltipBg;
@@ -552,7 +552,7 @@ export class BaseChart extends AvenxComponent {
       containerEl.clientWidth || 600,
       containerEl.clientHeight || 300,
       140,
-      70
+      70,
     );
 
     tooltipEl.style.left = `${pos.left}px`;

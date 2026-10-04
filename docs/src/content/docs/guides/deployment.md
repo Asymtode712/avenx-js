@@ -371,7 +371,7 @@ API_INTERNAL_URL=https://internal.example.com
 
 During the build process, Avenx replaces references to `process.env.AVX_PUBLIC_*` with their corresponding values from `process.env`. These values are stringified and inlined into the generated client-side JavaScript bundle.
 
-Both dotted access and bracket access (with single or double quotes) are supported:
+Both dotted access and bracket access (with single or double quotes, with optional whitespace inside the brackets) are supported:
 
 ```javascript
 const apiUrl = process.env.AVX_PUBLIC_API_URL;
