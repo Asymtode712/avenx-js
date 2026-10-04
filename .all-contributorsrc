@@ -1108,6 +1108,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "hridhinvarkeyjoseph",
+      "name": "hridhinvarkeyjoseph",
+      "avatar_url": "https://avatars.githubusercontent.com/u/318277129?v=4",
+      "profile": "https://github.com/hridhinvarkeyjoseph",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs",
