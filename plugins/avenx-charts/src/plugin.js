@@ -5,6 +5,7 @@
 
 import { ChartLine } from './components/ChartLine.js';
 import { BaseChart } from './components/BaseChart.js';
+import { ensureRuntime } from './runtime.js';
 
 /**
  * Registry of available chart types mapped to their component classes.
@@ -32,6 +33,12 @@ export const avenxCharts = {
     if (!app || typeof app.register !== 'function') {
       throw new Error('[avenx-charts] Invalid AvenxApp instance passed to plugin install().');
     }
+
+    // In the standalone browser build the chart classes extend a lazy
+    // placeholder; this binds it to the runtime the page published before
+    // app.register() validates that the classes extend AvenxComponent. A no-op
+    // in the module build, where the base is already the real class.
+    ensureRuntime();
 
     this.options = options;
 
