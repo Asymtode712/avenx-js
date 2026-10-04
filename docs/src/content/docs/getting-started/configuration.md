@@ -29,6 +29,7 @@ Avenx-JS reads optional project settings from `avenx.config.json` in the project
 | `distDir`      | `string`   | `"dist"`              | Non-empty relative path where compiled output is written.             |
 | `outputName`   | `string`   | `"bundle"`         | Base name used for generated JavaScript and CSS bundles. The compiler generates <outputName>.js and <outputName>.css. Must be a non-empty filename without an extension.|
 | `templatesDir` | `string`   | `".avenxtemplates"`  | Non-empty relative path for local generator template overrides.       |
+| `alias`        | `object`   | `{}`                  | Maps import path prefixes to target paths. See [Path aliases](#path-aliases-alias). |
 | `server.port`  | `number`   | `3000`                | Valid TCP port from `0` to `65535`.                                    |
 | `server.host`  | `string`   | `"localhost"`         | Non-empty host name or address for the local dev server.              |
 | `server.liveReload` | `boolean` | `true`              | Enables file watching, automatic browser reloads, and inspection script injection. |
@@ -41,6 +42,38 @@ Avenx-JS reads optional project settings from `avenx.config.json` in the project
 | `incremental`  | `boolean`  | `false`                | Lets `avenx serve`, `avenx watch` and `avenx check --watch` reuse the compilation of a file that has not changed, so a rebuild after one edit does not recompile the project. See [Incremental rebuilds](#incremental-rebuilds-incremental). |
 
 Path options must be relative paths. Absolute paths are rejected during configuration loading.
+
+## Path aliases (`alias`)
+
+Use `alias` to map import path prefixes to target directories. The value is an object whose keys are alias prefixes and whose values are target paths:
+
+```json
+{
+  "alias": {
+    "@": "src",
+    "@components": "src/components"
+  }
+}
+```
+
+Imports using those prefixes are resolved through the configured target:
+
+```javascript
+import Header from '@/components/Header.js';
+import Button from '@components/Button.js';
+```
+
+An import matches an alias only when it is an exact match for the alias key or starts with that key followed by `/`. For example, `@components/Button.js` matches `@components`, while `@componentsButton.js` does not.
+
+Relative alias targets are resolved from the project root. Absolute target paths are used as-is, and imports that match no alias are left unchanged.
+
+The `alias` value itself must be an object. Using a string, array, `null`, or another non-object value causes configuration loading to fail with:
+
+```text
+alias must be an object
+```
+
+The `.vscode/jsconfig.json` scaffolded by `avenx init` does not currently add `compilerOptions.paths` entries for aliases, so configuring an Avenx alias does not automatically configure editor path suggestions or autocomplete.
 
 
 ## Incremental rebuilds (`incremental`)
