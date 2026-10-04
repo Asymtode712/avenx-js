@@ -1117,6 +1117,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Asymtode712",
+      "name": "Siddheya Kulkarni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/115717746?v=4",
+      "profile": "http://siddheya-kulkarni-portfolio.vercel.app",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs",

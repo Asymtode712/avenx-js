@@ -182,6 +182,7 @@ If you have questions or want to contribute, feel free to reach out.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ArnavMohan65"><img src="https://avatars.githubusercontent.com/u/114442113?v=4?s=100" width="100px;" alt="Arnav Mohan "/><br /><sub><b>Arnav Mohan </b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=ArnavMohan65" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/hridhinvarkeyjoseph"><img src="https://avatars.githubusercontent.com/u/318277129?v=4?s=100" width="100px;" alt="hridhinvarkeyjoseph"/><br /><sub><b>hridhinvarkeyjoseph</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=hridhinvarkeyjoseph" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://siddheya-kulkarni-portfolio.vercel.app"><img src="https://avatars.githubusercontent.com/u/115717746?v=4?s=100" width="100px;" alt="Siddheya Kulkarni"/><br /><sub><b>Siddheya Kulkarni</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=Asymtode712" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
