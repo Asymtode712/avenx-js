@@ -373,7 +373,10 @@ During the build process, Avenx replaces references to `process.env.AVX_PUBLIC_*
 
 ```javascript
 const apiUrl = process.env.AVX_PUBLIC_API_URL;
+const apiUrlFromBracketAccess = process.env['AVX_PUBLIC_API_URL'];
 ```
+
+Both dotted access and bracket access with a string literal (single or double quotes, with optional whitespace inside the brackets) are supported. Computed keys such as `process.env[someVariable]` cannot be resolved at build time.
 
 **Never put secrets in an `AVX_PUBLIC_` variable.** Values referenced through `process.env.AVX_PUBLIC_*` are replaced at build time and can become part of the generated client-side JavaScript bundle, so they should be treated as public.
 
