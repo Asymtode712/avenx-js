@@ -186,6 +186,7 @@ If you have questions or want to contribute, feel free to reach out.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Vishwanath06-gif"><img src="https://avatars.githubusercontent.com/u/199033390?v=4?s=100" width="100px;" alt="Vishwanath"/><br /><sub><b>Vishwanath</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=Vishwanath06-gif" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/shwetang01"><img src="https://avatars.githubusercontent.com/u/183992718?v=4?s=100" width="100px;" alt="Shwetang Yadav"/><br /><sub><b>Shwetang Yadav</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=shwetang01" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/cestercian"><img src="https://avatars.githubusercontent.com/u/183791452?v=4?s=100" width="100px;" alt="Cestercian"/><br /><sub><b>Cestercian</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=cestercian" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/slophisticated"><img src="https://avatars.githubusercontent.com/u/173571271?v=4?s=100" width="100px;" alt="Rafael Ramdani"/><br /><sub><b>Rafael Ramdani</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=slophisticated" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

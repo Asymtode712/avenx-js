@@ -1153,6 +1153,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "slophisticated",
+      "name": "Rafael Ramdani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173571271?v=4",
+      "profile": "https://github.com/slophisticated",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs",
