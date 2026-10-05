@@ -27,15 +27,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BIN_PATH = path.join(__dirname, '../../bin/avenx.js');
 
 const root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'avenx-scaffold-'));
+const routingRoot = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'avenx-routing-scaffold-'));
 
 /**
  * Runs the CLI in the scaffolded project.
  * @param {string[]} args - CLI arguments.
  * @returns {{status: number, output: string}} The result.
  */
-function avenx(args) {
+function avenx(args, cwd = root) {
   const res = spawnSync(process.execPath, [BIN_PATH, ...args], {
-    cwd: root,
+    cwd,
     encoding: 'utf8',
     env: { ...process.env, NO_COLOR: '1' },
   });
@@ -131,7 +132,131 @@ try {
     console.log('  ✅ the page and component scaffolds both use named style blocks');
   }
 
+  // --- routing scaffold styles are emitted and warning-free ---------------
+  {
+    const init = avenx(['init', '-y', '--layout', 'routing'], routingRoot);
+    assert.strictEqual(init.status, 0, `routing init should succeed:\n${init.output}`);
+
+    const homeTemplate = fs.readFileSync(
+      path.join(routingRoot, 'src/pages/home.page.js'),
+      'utf8',
+    );
+    const aboutTemplate = fs.readFileSync(
+      path.join(routingRoot, 'src/pages/about.page.js'),
+      'utf8',
+    );
+    const homeStyles = fs.readFileSync(
+      path.join(routingRoot, 'src/pages/home.page.css'),
+      'utf8',
+    );
+    const aboutStyles = fs.readFileSync(
+      path.join(routingRoot, 'src/pages/about.page.css'),
+      'utf8',
+    );
+    const navbarStyles = fs.readFileSync(
+      path.join(routingRoot, 'src/components/navbar/navbar.component.css'),
+      'utf8',
+    );
+    const navbarTemplate = fs.readFileSync(
+      path.join(routingRoot, 'src/components/navbar/navbar.component.js'),
+      'utf8',
+    );
+
+    for (const [name, template, stylesheet] of [
+      ['Home', homeTemplate, homeStyles],
+      ['About', aboutTemplate, aboutStyles],
+    ]) {
+      assert.ok(
+        template.includes('<div @css pageContainer>'),
+        `${name} page should attach its container style with @css`,
+      );
+      assert.ok(
+        /\npageContainer\s*\{/.test(stylesheet),
+        `${name} page stylesheet should declare a named pageContainer block`,
+      );
+      assert.ok(
+        !/^\s*\.page-container\s*\{/m.test(stylesheet),
+        `${name} page stylesheet must not use a raw .page-container selector as a block name`,
+      );
+    }
+
+    assert.ok(
+      homeTemplate.includes('<h1>{{ title }} Page</h1>'),
+      'Home page should read its title state',
+    );
+    assert.ok(
+      aboutTemplate.includes('<h1>{{ title }} Page</h1>'),
+      'About page should read its title state',
+    );
+    assert.ok(
+      navbarTemplate.includes("this.state.activeRoute = window.location.hash || '#/';"),
+      'Navbar should initialize activeRoute from the current hash',
+    );
+    assert.ok(
+      navbarTemplate.includes(
+        'aria-current="{{ activeRoute === \'#/\' ? \'page\' : \'\' }}"',
+      ),
+      'Home link should expose aria-current="page" when #/ is active',
+    );
+    assert.ok(
+      navbarTemplate.includes(
+        'aria-current="{{ activeRoute === \'#/about\' ? \'page\' : \'\' }}"',
+      ),
+      'About link should expose aria-current="page" when #/about is active',
+    );
+
+    assert.ok(
+      navbarStyles.includes('&:hover {'),
+      'the navbar hover rule should be nested inside the link named block',
+    );
+    assert.ok(
+      !/^\s*link:hover\s*\{/m.test(navbarStyles),
+      'link:hover must not be declared as a top-level named block',
+    );
+
+    const routingBuild = avenx(['build'], routingRoot);
+    assert.strictEqual(
+      routingBuild.status,
+      0,
+      `the routing scaffold must build:\n${routingBuild.output}`,
+    );
+    const routingCodes = [
+      ...new Set(routingBuild.output.match(/AVX_[A-Z]\d+/g) || []),
+    ];
+    assert.deepStrictEqual(
+      routingCodes,
+      [],
+      `a fresh routing scaffold must build without diagnostics, but reported ` +
+        `${routingCodes.join(', ')}:\n${routingBuild.output}`,
+    );
+    assert.ok(
+      !/\bwarning\b/i.test(routingBuild.output),
+      `a fresh routing scaffold must build without warnings:\n${routingBuild.output}`,
+    );
+
+    const css = fs.readFileSync(path.join(routingRoot, 'dist', 'bundle.css'), 'utf8');
+    assert.ok(
+      css.includes('max-width: 800px'),
+      'routing bundle.css should contain the page container max-width rule',
+    );
+    assert.ok(
+      css.includes('margin: 0 auto'),
+      'routing bundle.css should contain the page container centering rule',
+    );
+    assert.ok(
+      css.includes('padding: 20px'),
+      'routing bundle.css should contain the page container padding rule',
+    );
+    assert.ok(
+      css.includes(':hover'),
+      'routing bundle.css should contain the navbar hover selector',
+    );
+
+    console.log('  ✅ routing scaffold emits styles and builds with no warnings');
+  }
+
   console.log('✅ Scaffold clean-build tests passed!');
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
+  fs.rmSync(routingRoot, { recursive: true, force: true });
 }
