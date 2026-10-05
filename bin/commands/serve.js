@@ -557,7 +557,7 @@ export function getInspectorHtml(cli) {
                 <h1 class="title">Avenx Inspector</h1>
             </div>
             <div class="status-indicator">
-                <span class="badge" id="statusBadge">Connecting...</span>
+                <span class="badge" id="statusBadge" role="status" aria-live="polite" aria-atomic="true">Connecting...</span>
             </div>
         </header>
 
@@ -578,7 +578,7 @@ export function getInspectorHtml(cli) {
                 <!-- Routing Section -->
                 <section class="card grid-card routing-card" role="region" aria-labelledby="routing-heading">
                     <h2 id="routing-heading">Active Routing Table</h2>
-                    <div id="routingList" class="info-list"></div>
+                    <div id="routingList" class="info-list" aria-live="off"></div>
                     <hr />
                     <h3>Current Route</h3>
                     <div id="currentRouteInfo" class="route-info">-</div>
@@ -587,13 +587,13 @@ export function getInspectorHtml(cli) {
                 <!-- Components Section -->
                 <section class="card grid-card components-card" role="region" aria-labelledby="components-heading">
                     <h2 id="components-heading">Registered Components</h2>
-                    <div id="componentsList" class="info-list"></div>
+                    <div id="componentsList" class="info-list" aria-live="off"></div>
                 </section>
 
                 <!-- Bridges Section -->
                 <section class="card grid-card bridges-card" role="region" aria-labelledby="bridges-heading">
                     <h2 id="bridges-heading">Active Bridges</h2>
-                    <div id="bridgesList" class="info-list"></div>
+                    <div id="bridgesList" class="info-list" aria-live="off"></div>
                 </section>
             </section>
         </main>
@@ -604,14 +604,17 @@ export function getInspectorHtml(cli) {
         
         const channel = new BroadcastChannel('avenx-inspector-channel');
         let lastUpdate = 0;
+        let connectionStatus = null;
 
         function updateStatus(connected) {
+            if (connectionStatus === connected) return;
+            connectionStatus = connected;
             const badge = document.getElementById('statusBadge');
             if (connected) {
-                badge.textContent = 'Live';
+                badge.textContent = '● Connected';
                 badge.className = 'badge connected';
             } else {
-                badge.textContent = 'Disconnected';
+                badge.textContent = '○ Disconnected';
                 badge.className = 'badge disconnected';
             }
         }
