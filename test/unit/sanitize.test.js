@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { Sanitizer } from '../../lib/core/security/sanitize.js';
+import { logger } from '../../lib/core/runtime/AvenxLogger.js';
 import { MockDOMElement, setupDOMMock, teardownDOMMock } from '../helpers/dom-mock.js';
 
 function testSanitizerWithDOM() {
@@ -72,6 +73,37 @@ function testSanitizerWithDOM() {
 
     console.log('  ✅ Sanitizer with DOMParser tests passed!');
   } finally {
+    teardownDOMMock();
+  }
+}
+
+function testSanitizerRespectsLogger() {
+  setupDOMMock();
+  const originalConfig = { ...logger.config };
+  const warnings = [];
+  const originalConsoleWarn = console.warn;
+  console.warn = (...args) => warnings.push(args);
+
+  try {
+    const sanitizer = new Sanitizer();
+    const container = new MockDOMElement('div');
+    container.appendChild(new MockDOMElement('script'));
+    logger.configure({ silent: true });
+    sanitizer._sanitizeNode(container);
+    assert.deepStrictEqual(warnings, []);
+
+    logger.configure({
+      silent: false,
+      formatter: (level, args) => [`custom:${level}`, ...args],
+      transports: [(level, formatted) => warnings.push(formatted)],
+    });
+    sanitizer._sanitizeNode(container);
+    assert.strictEqual(warnings.length, 1);
+    assert.strictEqual(warnings[0][0], 'custom:warn');
+    assert.match(warnings[0][1], /Sanitized tag/);
+  } finally {
+    logger.configure(originalConfig);
+    console.warn = originalConsoleWarn;
     teardownDOMMock();
   }
 }
@@ -259,6 +291,7 @@ function testStripTags() {
 
 try {
   testSanitizerWithDOM();
+  testSanitizerRespectsLogger();
   testSanitizerFallback();
   testCustomVoidTags();
   testConfigurablePolicyOptions();
