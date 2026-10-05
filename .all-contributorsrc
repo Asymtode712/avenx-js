@@ -1144,6 +1144,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "cestercian",
+      "name": "Cestercian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/183791452?v=4",
+      "profile": "https://github.com/cestercian",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs",
