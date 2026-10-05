@@ -3000,6 +3000,48 @@ Component "<{0}>" referenced in template of {1} does not resolve to a registered
 
 This is a warning rather than an error precisely because a component may be registered at runtime. `avenx check` reports it (including in `--json` output), so a rename that misses one call site no longer passes CI silently.
 
+### AVX_W57 — COMPONENT_NON_REACTIVE_ASSIGNMENT
+
+**Warning Message**
+
+```text
+Direct assignment to "this.{0}" on component <{1}> is non-reactive and will not trigger DOM updates. Declare "{0}" in <state> instead.
+```
+
+**Cause:** A property was assigned directly to a component instance (`this.<property> = value`) outside the constructor without being declared in `<state>`. Directly assigned instance properties are plain JavaScript properties: they are not wrapped in Avenx's reactive Proxy, so mutations to them bypass change detection and will not trigger DOM updates.
+
+**Resolution:** Declare the property inside the component's `<state>` tag with an initial value. If the property is intended to be a non-reactive local instance field, initialize it within the constructor (`this.prop = value`).
+
+**Incorrect**
+
+Assigning an undeclared property in an action or method:
+
+```html
+<state count="0" />
+
+<action name="increment">
+  // ❌ "total" is not declared in <state>; assigning it directly is non-reactive
+  this.total = this.count + 1;
+</action>
+
+<div>{{ count }}</div>
+```
+
+**Correct**
+
+Declaring the property in `<state>` so it is reactive:
+
+```html
+<state count="0" total="0" />
+
+<action name="increment">
+  // ✅ "total" is declared in <state>; mutating it triggers reactive updates
+  this.state.total = this.state.count + 1;
+</action>
+
+<div>{{ count }} (Total: {{ total }})</div>
+```
+
 ## Runtime Codes (`AVX_R*`)
 
 | Code        | Default Message                                                                         | Cause & Resolution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
