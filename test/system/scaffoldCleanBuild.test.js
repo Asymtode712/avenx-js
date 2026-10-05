@@ -157,6 +157,10 @@ try {
       path.join(routingRoot, 'src/components/navbar/navbar.component.css'),
       'utf8',
     );
+    const navbarTemplate = fs.readFileSync(
+      path.join(routingRoot, 'src/components/navbar/navbar.component.js'),
+      'utf8',
+    );
 
     for (const [name, template, stylesheet] of [
       ['Home', homeTemplate, homeStyles],
@@ -177,6 +181,31 @@ try {
     }
 
     assert.ok(
+      homeTemplate.includes('<h1>{{ title }} Page</h1>'),
+      'Home page should read its title state',
+    );
+    assert.ok(
+      aboutTemplate.includes('<h1>{{ title }} Page</h1>'),
+      'About page should read its title state',
+    );
+    assert.ok(
+      navbarTemplate.includes("this.state.activeRoute = window.location.hash || '#/';"),
+      'Navbar should initialize activeRoute from the current hash',
+    );
+    assert.ok(
+      navbarTemplate.includes(
+        'aria-current="{{ activeRoute === \'#/\' ? \'page\' : \'\' }}"',
+      ),
+      'Home link should expose aria-current="page" when #/ is active',
+    );
+    assert.ok(
+      navbarTemplate.includes(
+        'aria-current="{{ activeRoute === \'#/about\' ? \'page\' : \'\' }}"',
+      ),
+      'About link should expose aria-current="page" when #/about is active',
+    );
+
+    assert.ok(
       navbarStyles.includes('&:hover {'),
       'the navbar hover rule should be nested inside the link named block',
     );
@@ -191,9 +220,18 @@ try {
       0,
       `the routing scaffold must build:\n${routingBuild.output}`,
     );
+    const routingCodes = [
+      ...new Set(routingBuild.output.match(/AVX_[A-Z]\d+/g) || []),
+    ];
+    assert.deepStrictEqual(
+      routingCodes,
+      [],
+      `a fresh routing scaffold must build without diagnostics, but reported ` +
+        `${routingCodes.join(', ')}:\n${routingBuild.output}`,
+    );
     assert.ok(
-      !routingBuild.output.includes('AVX_W55'),
-      `a fresh routing scaffold must not emit AVX_W55:\n${routingBuild.output}`,
+      !/\bwarning\b/i.test(routingBuild.output),
+      `a fresh routing scaffold must build without warnings:\n${routingBuild.output}`,
     );
 
     const css = fs.readFileSync(path.join(routingRoot, 'dist', 'bundle.css'), 'utf8');
@@ -214,7 +252,7 @@ try {
       'routing bundle.css should contain the navbar hover selector',
     );
 
-    console.log('  ✅ routing scaffold emits page styles and no AVX_W55');
+    console.log('  ✅ routing scaffold emits styles and builds with no warnings');
   }
 
   console.log('✅ Scaffold clean-build tests passed!');
