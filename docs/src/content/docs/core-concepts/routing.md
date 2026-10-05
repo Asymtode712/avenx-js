@@ -379,6 +379,41 @@ app.initRouter(
 Routes that do not declare a `title` property leave `document.title` unchanged. This lets you opt individual routes out of automatic title management.
 :::
 
+### Accessibility on navigation
+
+After a successful navigation, the router announces the current `document.title`
+through a visually hidden, polite `role="status"` region. It clears the region
+before each announcement so that navigating between routes with the same title
+can announce it again. Give routes meaningful titles for useful announcements.
+
+On later navigations, the router also moves focus to the new page's
+`[data-ax-page-heading]` element. Mark the heading in each page component:
+
+```html
+<h1 data-ax-page-heading>Profile</h1>
+```
+
+If the page has no marked heading, the router focuses its page container. It
+adds `tabindex="-1"` when the target has no `tabindex` and focuses it with
+`preventScroll: true`. The initial page load does not move focus.
+
+Use the router's `a11y` options to choose another target or disable either
+behavior:
+
+```javascript
+app.initRouter(routes, {
+  a11y: {
+    focusTarget: '[data-main-heading]',
+    focusOnNavigate: true,
+    announceRouteChanges: true,
+  },
+});
+```
+
+If the custom selector finds nothing in the new page, the router still tries
+`[data-ax-page-heading]` before falling back to the page container. See the
+[router API reference](/api-reference/router-guard) for option defaults.
+
 ## 7. Route Guards
 
 Guards decide whether a transition to a page is allowed. Create a guard using the CLI:

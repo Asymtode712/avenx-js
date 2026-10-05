@@ -23,6 +23,15 @@ The second argument to `initRouter` is an optional `options` object that control
 | `transition`           | `string` | `'none'`    | Enables a named transition effect (e.g. `'fade'`, `'slide'`) applied to the page container when navigating between routes.                                                                                        |
 | `scrollRestoration` | `'top' \| 'auto' \| 'manual'` | `'top'` | Controls window scroll behavior on route transitions. `'top'` scrolls to the top on every navigation, `'auto'` remembers and restores scroll positions, and `'manual'` leaves the current scroll position unchanged. |
 
+The `a11y` object controls focus and screen-reader announcements after a
+successful navigation:
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `a11y.focusOnNavigate` | `boolean` | `true` | Focuses the new page's heading (or page container) after navigation. The initial page load does not move focus. |
+| `a11y.announceRouteChanges` | `boolean` | `true` | Announces the current `document.title` through a polite `role="status"` live region when the title is nonempty. The region is cleared before each announcement. |
+| `a11y.focusTarget` | `string` | `'[data-ax-page-heading]'` | Selector searched within the new page for a focus target. If it matches nothing, the router tries `[data-ax-page-heading]`, then the page container. A target without `tabindex` receives `tabindex="-1"` and is focused with `preventScroll: true`. |
+
 ```javascript
 const router = AvenxApp.initRouter(routes, {
   prefix: '/app',
