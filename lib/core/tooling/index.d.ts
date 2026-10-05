@@ -8,7 +8,13 @@ export interface InvalidComponentTagIssue {
 }
 
 export function componentNameFromFile(fileName: string): string;
-export function findRegisteredComponents(projectRoot: string, componentsDir?: string): Set<string>;
+export function findRegisteredComponents(
+  projectRoot: string,
+  componentsDir?: string,
+  options?: { maxAgeMs?: number },
+): Set<string>;
+/** Clears the cached component registries, e.g. between tests. */
+export function clearRegistryCache(): void;
 export function extractLintableTemplate(source: string): string;
 export function findInvalidComponentTags(source: string, registeredComponents: Set<string>): InvalidComponentTagIssue[];
 export function findProjectRoot(filePath: string, fallbackRoot: string): string;
