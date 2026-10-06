@@ -52,10 +52,12 @@
     "LICENSE"
   ],
   "sideEffects": [
+    "./lib/compiler/ComponentParser.js",
+    "./lib/config.js",
+    "./lib/core/expression/interpreter.js",
     "./lib/core/reactive/proxyHandler.js",
     "./lib/core/renderer/installStringRenderer.js",
-    "./lib/core/runtime/installVirtualList.js",
-    "./lib/core/expression/interpreter.js"
+    "./lib/core/runtime/installVirtualList.js"
   ],
   "scripts": {
     "test": "node test/run-tests.js",
