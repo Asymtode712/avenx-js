@@ -51,6 +51,14 @@
     "README.md",
     "LICENSE"
   ],
+  "sideEffects": [
+    "./lib/compiler/ComponentParser.js",
+    "./lib/config.js",
+    "./lib/core/expression/interpreter.js",
+    "./lib/core/reactive/proxyHandler.js",
+    "./lib/core/renderer/installStringRenderer.js",
+    "./lib/core/runtime/installVirtualList.js"
+  ],
   "scripts": {
     "test": "node test/run-tests.js",
     "test:plugins": "npm --prefix plugins/avenx-i18n test && npm --prefix plugins/avenx-persistence test && npm --prefix plugins/avenx-charts test",
