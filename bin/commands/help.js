@@ -29,10 +29,10 @@ ${bold(cyan('Commands:'))}
   ${green('atlas')}                     ${gray('Show the compiler\'s semantic map of the application')}
   ${green('impact <symbol>')}           ${gray('What can be affected if this changes')}
   ${green('why <symbol>')}              ${gray('Where this value comes from')}
-  ${green('trace list')}                ${gray('List recorded causal traces')}
-  ${green('trace view <id|latest>')}    ${gray('Print a trace as a causal tree: event to DOM patch')}
+  ${green('trace list (ls)')}           ${gray('List recorded causal traces (default for bare "avenx trace")')}
+  ${green('trace view (show) <id|latest>')} ${gray('Print a trace as a causal tree: event to DOM patch')}
   ${green('trace export <id|latest>')}  ${gray('Turn a recorded trace into a regression test')}
-  ${green('trace prune')}               ${gray('Remove stored traces')}
+  ${green('trace prune (clean)')}       ${gray('Remove stored traces')}
   ${green('serve [port]')}              ${gray('Start dev server with hot-reload (default: 3000)')}
   ${green('watch (w)')}                 ${gray('Watch for file changes and rebuild automatically')}
   ${green('format')}                    ${gray('Format project files using Prettier')}
