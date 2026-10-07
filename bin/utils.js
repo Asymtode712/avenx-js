@@ -78,42 +78,119 @@ export function checkGitStatus(cwd = process.cwd()) {
 }
 
 /**
+ * Creates a shared prompt session that buffers stdin lines between questions.
+ *
+ * `readline.question()` only listens for the next line while that particular
+ * question is active. In a piped run, stdin can deliver several lines at once,
+ * so answers after the first one can otherwise be emitted before the next
+ * question starts and be lost. Keeping one interface for the whole wizard and
+ * queueing its `line` events preserves every supplied answer.
+ *
+ * EOF also settles any pending question with `null`, so callers never wait on
+ * a promise that can no longer receive input.
+ * @param {NodeJS.ReadableStream} [input] - Input stream.
+ * @param {NodeJS.WritableStream} [output] - Output stream.
+ * @returns {{question: function(string): Promise<string|null>, close: function(): void}}
+ */
+export function createPromptSession(input = process.stdin, output = process.stdout) {
+  const rl = readline.createInterface({ input, output });
+  const queuedAnswers = [];
+  const pendingQuestions = [];
+  let closed = false;
+
+  rl.on('line', (answer) => {
+    const resolve = pendingQuestions.shift();
+    if (resolve) {
+      resolve(answer);
+    } else {
+      queuedAnswers.push(answer);
+    }
+  });
+
+  rl.on('close', () => {
+    closed = true;
+    while (pendingQuestions.length > 0) {
+      pendingQuestions.shift()(null);
+    }
+  });
+
+  return {
+    question(query) {
+      output.write(query);
+
+      if (queuedAnswers.length > 0) {
+        return Promise.resolve(queuedAnswers.shift());
+      }
+      if (closed) {
+        return Promise.resolve(null);
+      }
+
+      return new Promise((resolve) => {
+        pendingQuestions.push(resolve);
+      });
+    },
+    close() {
+      if (!closed) {
+        rl.close();
+      }
+    },
+  };
+}
+
+/**
  * Prompts the user with a question on the command line.
  * @param {string} query - The question query.
  * @param {string} [defaultValue] - The default response.
  * @param {function(string): (boolean|string)} [validator] - Optional function validating input.
+ * @param {{question: function(string): Promise<string|null>, close: function(): void}} [session]
+ *   Shared prompt session. When omitted, this function owns a temporary session.
  * @returns {Promise<string>}
  */
-export function promptQuestion(query, defaultValue, validator = null) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+export async function promptQuestion(query, defaultValue, validator = null, session = null) {
+  const promptSession = session || createPromptSession();
+  const ownsSession = !session;
 
-  return new Promise((resolve) => {
-    const ask = () => {
-      rl.question(query, (answer) => {
-        let trimmed = answer.trim();
+  try {
+    while (true) {
+      const answer = await promptSession.question(query);
+      let trimmed;
+
+      if (answer === null) {
+        if (defaultValue === undefined) {
+          const promptName = query.split('\n')[0].trim();
+          throw new Error(`Input ended before an answer was provided for: ${promptName}`);
+        }
+        trimmed = defaultValue;
+      } else {
+        trimmed = answer.trim();
         if (trimmed === '' && defaultValue !== undefined) {
           trimmed = defaultValue;
         }
-        if (validator) {
-          const valid = validator(trimmed);
-          if (valid === true) {
-            rl.close();
-            resolve(trimmed);
-          } else {
-            console.log(red(`❌ ${valid}`));
-            ask();
-          }
-        } else {
-          rl.close();
-          resolve(trimmed);
-        }
-      });
-    };
-    ask();
-  });
+      }
+
+      if (!validator) {
+        return trimmed;
+      }
+
+      const valid = validator(trimmed);
+      if (valid === true) {
+        return trimmed;
+      }
+
+      console.log(red(`❌ ${valid}`));
+
+      // Once stdin has reached EOF there is no value a retry could consume.
+      // A valid default has already returned above, so an invalid default must
+      // fail instead of spinning forever.
+      if (answer === null) {
+        throw new Error(`Input ended while retrying: ${query.split('\n')[0].trim()}`);
+      }
+    }
+  } finally {
+    if (ownsSession) {
+      promptSession.close();
+    }
+  }
 }
 
 /**
