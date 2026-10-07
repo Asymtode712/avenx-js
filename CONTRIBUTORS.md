@@ -191,6 +191,7 @@ If you have questions or want to contribute, feel free to reach out.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/RuhaaBhalerao"><img src="https://avatars.githubusercontent.com/u/224724327?v=4?s=100" width="100px;" alt="Ruhaa Bhalerao"/><br /><sub><b>Ruhaa Bhalerao</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=RuhaaBhalerao" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Xinglan233"><img src="https://avatars.githubusercontent.com/u/130824939?v=4?s=100" width="100px;" alt="星闌"/><br /><sub><b>星闌</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=Xinglan233" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AK-Lmn"><img src="https://avatars.githubusercontent.com/u/179229555?v=4?s=100" width="100px;" alt="AK-Lmn"/><br /><sub><b>AK-Lmn</b></sub></a><br /><a href="https://github.com/Avenx-JS/avenx-js/commits?author=AK-Lmn" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>

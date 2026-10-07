@@ -1180,6 +1180,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "AK-Lmn",
+      "name": "AK-Lmn",
+      "avatar_url": "https://avatars.githubusercontent.com/u/179229555?v=4",
+      "profile": "https://github.com/AK-Lmn",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitType": "docs",
