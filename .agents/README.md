@@ -1,5 +1,6 @@
-# Good First Issue: Document avenx doctor Command in CLI Reference
-The Avenx CLI includes an `avenx doctor` command that performs automated diagnostic checks on the project configuration, Node environment, dependency versions, and output directory permissions. However, this command is missing from the CLI Reference documentation table in `README.md` and the online docs. By dividing responsibilities, we ensure consistent standards, prevent regression bugs, and speed up software development.
+# Agent Instructions
+
+The `.agents/` directory contains project-scoped instructions for contributors and automated coding agents working on Avenx.js. By dividing responsibilities across focused areas, these instructions help keep changes consistent, prevent regressions, and make development work easier to review.
 
 ## Directory Overview
 
@@ -21,9 +22,9 @@ Depending on your current branch, task, or targeted file path, choose the corres
 | :--- | :--- | :--- |
 | **Core Runtime & Renderer** | `lib/core/runtime/`, `lib/core/renderer/`, `lib/core/reactive/`, `lib/core/events/` | Optimizing DOM diffs, adding runtime lifecycle hooks, refining reactivity handlers, implementing route guards. |
 | **Compiler & Parser** | `lib/compiler/`, `lib/compiler.js` | Adding new component tag parsing support, upgrading css scope hashes, expression parsing. |
-| **CLI & Tooling** | `bin/avenx.js`, `vite-plugin-avenx/` | Scaffolding templates, modifying Vite plugin build triggers, HMR handler adjustments. |
-| **Testing & Performance** | `test/`, `benches/`, CI workflows (`.github/workflows`) | Creating unit/integration tests, performance profiling, tracking bundle size regressions. |
-| **Documentation & DevRel** | `docs/`, examples/ | Creating API tutorials, modifying markdown pages, refining frontmatter Astro configurations. |
+| **CLI & Tooling** | `bin/avenx.js`, `bin/cli.js`, `bin/commands/`, `plugins/avenx-vite/` | Scaffolding templates, modifying Vite plugin build triggers, HMR handler adjustments. |
+| **Testing & Performance** | `test/`, `benches/`, CI workflows (`.github/workflows/`) | Creating unit/integration tests, performance profiling, tracking bundle size regressions. |
+| **Documentation & DevRel** | `docs/`, `templates/`, `plugins/avenx-vite/example/` | Creating API tutorials, maintaining examples and starter templates, refining frontmatter and Astro configurations. |
 
 ---
 
