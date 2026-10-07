@@ -387,6 +387,8 @@ Launches a local live-reloading development server with automatic file watching 
 - `--trace`: Records a causal trace of the running application. Off by default. See [`avenx trace`](#14-avenx-trace) and the [Avenx Trace guide](/core-concepts/trace/).
 
 - `--open`, `-o`: Opens the default browser once the development server is listening. Off by default; closing the browser does not stop the server.
+
+Custom HTTP response headers (such as `Content-Security-Policy` or CORS headers) can be attached to every dev-server response via [`server.headers`](/getting-started/configuration#dev-server-response-headers-serverheaders) in `avenx.config.json`. These headers apply to `avenx serve` only and do not affect production builds.
  
 #### Visual Inspection Dashboard (`/__avenx-inspect`)
 
