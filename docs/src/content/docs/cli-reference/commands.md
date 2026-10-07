@@ -694,7 +694,9 @@ Traces are recorded by `avenx serve --trace` and stored in `.avenx/traces/`, one
 
 #### `avenx trace list`
 
-Lists stored traces, newest first.
+Lists stored traces, newest first (alias: `avenx trace ls`).
+
+A bare `avenx trace` is equivalent to `avenx trace list`.
 
 ```bash
 npx avenx trace list
@@ -712,7 +714,7 @@ trace-a91c      8m      42       7            best-effort
 
 #### `avenx trace view <id|latest>`
 
-Prints a trace as a causal tree. Every line sits under the thing that caused it.
+Prints a trace as a causal tree (alias: `avenx trace show <id|latest>`). Every line sits under the thing that caused it.
 
 ```bash
 npx avenx trace view trace-4f2a
@@ -759,7 +761,7 @@ The command warns when a trace is best-effort, when values were redacted, and wh
 
 #### `avenx trace prune`
 
-Removes stored traces.
+Removes stored traces (alias: `avenx trace clean`).
 
 ```bash
 npx avenx trace prune              # keep the 20 newest

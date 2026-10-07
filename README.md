@@ -695,7 +695,7 @@ compresses best, so the gap on the wire is much narrower than on disk.
 | `avenx doctor` | Diagnose environment, config and project health. |
 | `avenx env` | Print and validate active environment variables. |
 | `avenx explain <CODE>` | Explain a diagnostic code, e.g. `avenx explain AVX_W53`. |
-| `avenx trace list` / `view <id\|latest>` / `export <id\|latest>` / `prune` | Record, read and export causal traces. |
+| `avenx trace list (ls)` / `view (show) <id\|latest>` / `export <id\|latest>` / `prune (clean)` | Record, read and export causal traces. Bare `avenx trace` is equivalent to `avenx trace list`. |
 
 ### Options
 
