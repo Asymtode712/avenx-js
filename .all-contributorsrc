@@ -1171,6 +1171,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Xinglan233",
+      "name": "星闌",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130824939?v=4",
+      "profile": "https://github.com/Xinglan233",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitType": "docs",
