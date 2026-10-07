@@ -1,4 +1,4 @@
-import { promptQuestion } from './utils.js';
+import { createPromptSession, promptQuestion } from './utils.js';
 import { bold, cyan, red } from './colors.js';
 import { getClosestKey } from '../lib/config.js'; // Caso getClosestKey esteja em lib/config.js
 
@@ -75,44 +75,52 @@ export async function runWizard(args = []) {
   if (isInteractive) {
     const needsStylePrompt = !cliStyle;
     const needsLayoutPrompt = !cliLayout;
+    const needsPrompt = needsStylePrompt || needsLayoutPrompt;
+    const promptSession = needsPrompt ? createPromptSession() : null;
 
-    if (needsStylePrompt || needsLayoutPrompt) {
+    if (needsPrompt) {
       console.log(`\n${bold(cyan('--- Avenx-JS Project Wizard ---'))}\n`);
     }
 
-    // Only ask about the CSS preprocessor if the --style flag was not provided.
-    if (needsStylePrompt) {
-      const preprocessorInput = await promptQuestion(
-        'Select style preprocessor:\n' +
-          '  1. None (Vanilla CSS)\n' +
-          '  2. Sass (SCSS)\n' +
-          '  3. Less\n' +
-          '  4. PostCSS\n' +
-          'Choose an option (1-4, default: 1): ',
-        '1',
-        (val) => (['1', '2', '3', '4'].includes(val) ? true : 'Please enter a number between 1 and 4'),
-      );
+    try {
+      // Only ask about the CSS preprocessor if the --style flag was not provided.
+      if (needsStylePrompt) {
+        const preprocessorInput = await promptQuestion(
+          'Select style preprocessor:\n' +
+            '  1. None (Vanilla CSS)\n' +
+            '  2. Sass (SCSS)\n' +
+            '  3. Less\n' +
+            '  4. PostCSS\n' +
+            'Choose an option (1-4, default: 1): ',
+          '1',
+          (val) => (['1', '2', '3', '4'].includes(val) ? true : 'Please enter a number between 1 and 4'),
+          promptSession,
+        );
 
-      const mapping = {
-        1: 'none',
-        2: 'sass',
-        3: 'less',
-        4: 'postcss',
-      };
-      stylePreprocessor = mapping[preprocessorInput];
-    }
+        const mapping = {
+          1: 'none',
+          2: 'sass',
+          3: 'less',
+          4: 'postcss',
+        };
+        stylePreprocessor = mapping[preprocessorInput];
+      }
 
-    // Only ask about the layout if the --layout flag was NOT provided.
-    if (needsLayoutPrompt) {
-      const layoutInput = await promptQuestion(
-        'Select layout template:\n' +
-          '  1. Blank (Minimal setup)\n' +
-          '  2. Routing (Basic navigation with Navbar, Home and About pages)\n' +
-          'Choose an option (1-2, default: 1): ',
-        '1',
-        (val) => (['1', '2'].includes(val) ? true : 'Please enter 1 or 2'),
-      );
-      layoutTemplate = layoutInput === '2' ? 'routing' : 'blank';
+      // Only ask about the layout if the --layout flag was NOT provided.
+      if (needsLayoutPrompt) {
+        const layoutInput = await promptQuestion(
+          'Select layout template:\n' +
+            '  1. Blank (Minimal setup)\n' +
+            '  2. Routing (Basic navigation with Navbar, Home and About pages)\n' +
+            'Choose an option (1-2, default: 1): ',
+          '1',
+          (val) => (['1', '2'].includes(val) ? true : 'Please enter 1 or 2'),
+          promptSession,
+        );
+        layoutTemplate = layoutInput === '2' ? 'routing' : 'blank';
+      }
+    } finally {
+      promptSession?.close();
     }
   }
 
