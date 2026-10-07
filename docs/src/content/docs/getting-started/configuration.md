@@ -33,6 +33,11 @@ Avenx-JS reads optional project settings from `avenx.config.json` in the project
 | `server.port`  | `number`   | `3000`                | Valid TCP port from `0` to `65535`.                                    |
 | `server.host`  | `string`   | `"localhost"`         | Non-empty host name or address for the local dev server.              |
 | `server.liveReload` | `boolean` | `true`              | Enables file watching, automatic browser reloads, and inspection script injection. |
+| `server.headers` | `object` | `{}`                  | Custom HTTP response headers added to every dev-server response. Applies to `avenx serve` only. See [Dev-server response headers](#dev-server-response-headers-serverheaders). |
+| `hooks.prebuild` | `string` | `undefined`           | Synchronous shell command executed before the compiler builds. See [Build lifecycle hooks](#build-lifecycle-hooks-hooks). |
+| `hooks.postbuild` | `string` | `undefined`          | Synchronous shell command executed after a successful compiler build. See [Build lifecycle hooks](#build-lifecycle-hooks-hooks). |
+| `trace.redact` | `string[]` | `[]`                  | Property-path patterns redacted from causal trace recordings. See [Causality trace settings](#causality-trace-settings-trace). |
+| `trace.maxNodes` | `number` | `0`                   | Maximum number of nodes retained in the trace ring buffer (defaults to 5000 in recorder). See [Causality trace settings](#causality-trace-settings-trace). |
 | `enableProfiling` | `boolean` | `false` | Enables performance profiling by wrapping lifecycle hooks, rendering, and DOM patching with browser Performance API marks and measures. |
 | `debug.debugReactivity` | `boolean` | `false` | Enables verbose reactivity dependency tracking and watcher execution logging to the browser console during development. |
 | `treeShakeComponents` | `boolean` | `true` | Removes unused components from the compiled bundle during compilation. Set to `false` to compile all discovered components. |
@@ -270,6 +275,46 @@ If the configured preprocessor package is not installed, Avenx-JS falls back to 
 The configuration is merged with the defaults, so you can override only the settings your project needs.
 
 Set `server.liveReload` to `false` when the dev server should serve HTML without watching for changes or injecting the live-reload and inspection client script.
+
+---
+
+## Dev-server response headers (`server.headers`)
+
+Use `server.headers` to attach custom HTTP response headers to every response served by the local development server (`avenx serve`). The value is an object mapping header names to header values:
+
+```json
+{
+  "server": {
+    "headers": {
+      "Content-Security-Policy": "default-src 'self'",
+      "Access-Control-Allow-Origin": "*"
+    }
+  }
+}
+```
+
+This is useful when testing a Content-Security-Policy locally before deploying it, or adding CORS headers so a local API or external service accepts requests from the dev server during development.
+
+### Dev-server scope
+
+These headers apply to `avenx serve` only. They are not bundled into production builds created by `avenx build`. Custom headers configured here are a way to test header policies locally, not to deploy them; production response headers must be configured on whichever web server, reverse proxy, or CDN serves your `dist/` directory. See the [deployment guide](/guides/deployment) for production configuration details.
+
+### Timing and override behavior
+
+Headers are applied per-request in `avenx serve` using Node.js's `res.setHeader()` as soon as an incoming request is received (via `applyCustomHeaders`).
+
+Because custom headers are set using `res.setHeader()`, headers explicitly written by the dev server using `res.writeHead()` take precedence:
+
+- Server-managed headers such as `Content-Type` (which the dev server sets dynamically according to the file extension or internal endpoint response) cannot be overridden by `server.headers`.
+- Custom headers are sent on both successful (200) responses and error responses (such as 404 or 500).
+
+### Validation
+
+`server.headers` defaults to `{}`. If specified, it must be an object. Supplying a string, array, `null`, or any other non-object value causes configuration loading to fail with:
+
+```text
+server.headers must be an object
+```
 
 ## Performance Profiling
 
@@ -552,6 +597,56 @@ override `onConflict` for itself.
 
 A project that leaves this section alone emits no configuration into the bundle
 at all — the defaults are already in the runtime.
+
+---
+
+## Build Lifecycle Hooks (`hooks`)
+
+Use `hooks` to define synchronous shell commands that execute before and after the compiler runs:
+
+```json
+{
+  "hooks": {
+    "prebuild": "npm run prepare",
+    "postbuild": "npm run verify"
+  }
+}
+```
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `hooks.prebuild` | `string` | `undefined` | Synchronous shell command executed before the compiler builds. |
+| `hooks.postbuild` | `string` | `undefined` | Synchronous shell command executed after a successful compiler build. |
+
+Both commands execute from the project root directory in the sequence: `prebuild` → compiler build → `postbuild`.
+
+If defined, `hooks` must be an object (`hooks must be an object`), and `prebuild` / `postbuild` must be strings (`hooks.prebuild must be a string`, `hooks.postbuild must be a string`).
+
+For complete execution lifecycle and CI/CD integration details, see [Build Lifecycle Hooks](/guides/deployment#build-lifecycle-hooks) in the deployment guide.
+
+---
+
+## Causality Trace Settings (`trace`)
+
+Configure runtime causal trace recording when running `avenx serve --trace` or using `@avenx/testing`:
+
+```json
+{
+  "trace": {
+    "redact": ["auth.token", "user.*", "*.password", "billing.**"],
+    "maxNodes": 5000
+  }
+}
+```
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `trace.redact` | `string[]` | `[]` | Array of property-path patterns redacted from causal trace recordings at record time. |
+| `trace.maxNodes` | `number` | `0` | Maximum number of nodes retained in the trace ring buffer before evicting the oldest nodes (recorder defaults to `5000` when unset or `0`). |
+
+Redacted values never enter the recording ring buffer, ensuring sensitive properties cannot leak through trace exports.
+
+For pattern matching syntax and privacy guarantees, see [Privacy and redaction](/core-concepts/trace#6-privacy-and-redaction) in the Avenx Trace guide.
 
 ---
 
