@@ -3042,6 +3042,42 @@ Declaring the property in `<state>` so it is reactive:
 <div>{{ count }} (Total: {{ total }})</div>
 ```
 
+### AVX_W59 — COMPILER_DUPLICATE_ROUTE_PATTERN
+
+**Warning Message**
+
+```text
+[AVX_W59] Duplicate route pattern "{0}" declared in initRouter(). The later definition targeting page "{1}" shadows "{2}".
+
+Cause: This warning is emitted during compilation/Atlas analysis when app.initRouter() declares the exact same route pattern path (e.g. '/user/:id' or '/dup') more than once in its route configuration object.
+
+Because JavaScript object literals use last-wins semantics for duplicate keys, the later route target overwrites earlier declarations at runtime. When Atlas encounters a duplicate pattern, it adopts the same last-wins resolution order to stay in agreement with the emitted bundle, and emits AVX_W59 to highlight the shadowed route definition.
+
+Resolution: To resolve this warning:
+
+1. Review the route table object passed to app.initRouter().
+
+2. Remove or rename the duplicated route pattern path so each route key is unique.
+
+3. Verify that each route pattern points to its intended target page class.
+
+Incorrect
+
+app.initRouter({
+  '': 'Home',
+  '/user/:id': 'User',
+  '/user/:id': 'Home', // ❌ Duplicate pattern '/user/:id'; shadows 'User' and emits AVX_W59
+});
+
+Correct
+
+app.initRouter({
+  '': 'Home',
+  '/user/:id': 'User',
+  '/user/home': 'Home', // ✅ Unique route paths
+});
+```
+
 ## Runtime Codes (`AVX_R*`)
 
 | Code        | Default Message                                                                         | Cause & Resolution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
