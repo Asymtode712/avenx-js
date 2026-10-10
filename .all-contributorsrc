@@ -1189,6 +1189,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "JANANI-RS06",
+      "name": "JANANI-RS06",
+      "avatar_url": "https://avatars.githubusercontent.com/u/223864652?v=4",
+      "profile": "https://www.linkedin.com/in/rs-janani-47b882326/?isSelfProfile=true",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "commitType": "docs",
