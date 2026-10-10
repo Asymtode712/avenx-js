@@ -3078,6 +3078,44 @@ app.initRouter({
 });
 ```
 
+### AVX_W60 — COMPILER_UNDEFINED_PUBLIC_ENV
+
+**Warning Message**
+
+```text
+process.env.{0} in {1} has no value, so the build inlined undefined in its place.{2}
+The variable is set neither in the environment nor in .env. Fix the name, or set it before building -- a variable missing from the CI environment ships as undefined. Run `avenx env` to list every AVX_PUBLIC_* value this build can see. Silence this class with "warnings": { "AVX_W60": "off" } in avenx.config.json.
+```
+
+**Cause:** The compiler inlines every `process.env.AVX_PUBLIC_*` reference with its value at build time. When the variable is set neither in the environment nor in the project's `.env`, the reference is replaced with the literal `undefined`. Nothing fails at build time: the application receives `undefined` where it expected a value, and the failure surfaces later as a request to `undefined/users` or a blank value in the UI.
+
+This typically happens because:
+
+- The variable name is misspelled (`process.env.AVX_PUBLIC_API_URLL` instead of `process.env.AVX_PUBLIC_API_URL`). When a similarly named variable is set, the warning suggests it.
+- The variable is in a local `.env` but missing from the CI or deployment environment the build ran in.
+
+The warning is reported once per variable per file.
+
+**Resolution:**
+
+1. Run `avenx env` to list every `AVX_PUBLIC_*` value the build can see.
+2. Correct the reference, or add the variable to `.env` or the build environment.
+3. If `undefined` is intended, silence the class with `"warnings": { "AVX_W60": "off" }` in `avenx.config.json`, or set it to `"error"` to fail the build instead.
+
+**Incorrect**
+
+```js
+// .env: AVX_PUBLIC_API_URL=https://api.example.com
+const base = process.env.AVX_PUBLIC_API_URLL; // ❌ inlined as undefined; emits AVX_W60
+```
+
+**Correct**
+
+```js
+// .env: AVX_PUBLIC_API_URL=https://api.example.com
+const base = process.env.AVX_PUBLIC_API_URL; // ✅ inlined as "https://api.example.com"
+```
+
 ## Runtime Codes (`AVX_R*`)
 
 | Code        | Default Message                                                                         | Cause & Resolution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
